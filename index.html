@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Instagram Video Downloader</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f7f7f7; padding: 30px; }
+    .container { max-width: 500px; margin: auto; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px #ccc; }
+    input, button { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; font-size: 16px; }
+    button { background: #3897f0; color: #fff; border: none; cursor: pointer; }
+    video { width: 100%; margin-top: 20px; border-radius: 8px; }
+    .link { display: inline-block; margin-top: 10px; background: #28a745; color: white; padding: 10px; border-radius: 5px; text-decoration: none; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Instagram Video Downloader</h2>
+    <input type="url" id="url" placeholder="Enter Instagram video/reel URL" />
+    <button onclick="fetchVideo()">Download</button>
+    <div id="output"></div>
+  </div>
+
+  <script>
+    async function fetchVideo() {
+      const url = document.getElementById("url").value;
+      const output = document.getElementById("output");
+      output.innerHTML = "Loading...";
+
+      const res = await fetch("/download", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url })
+      });
+
+      const data = await res.json();
+      output.innerHTML = "";
+
+      if (data.error) {
+        output.textContent = "❌ " + data.error;
+        return;
+      }
+
+      data.media.forEach((link, i) => {
+        output.innerHTML += `
+          <video controls src="${link}"></video>
+          <a class="link" href="${link}" download>⬇️ Download Video ${i + 1}</a>
+        `;
+      });
+    }
+  </script>
+</body>
+</html>
